@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LaTeX Math Renderer with KaTeX</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <style>
@@ -216,7 +217,19 @@
 
                 <!-- Rendered Output -->
                 <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-xl font-semibold text-gray-700 mb-4">Rendered Output</h2>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold text-gray-700">Rendered Output</h2>
+                        <div class="flex gap-2">
+                            <button onclick="exportImage('png')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded text-sm font-medium transition flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                PNG
+                            </button>
+                            <button onclick="exportImage('jpeg')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded text-sm font-medium transition flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                JPEG
+                            </button>
+                        </div>
+                    </div>
                     <div id="syntaxFixNotice"></div>
                     <div id="renderOutput" class="text-2xl text-center"></div>
                 </div>
@@ -413,6 +426,28 @@
                 fixSyntax();
             }
         });
+
+        // Export rendered math as image
+        function exportImage(type) {
+            const element = document.getElementById('renderOutput');
+            
+            // Use html2canvas to capture the element
+            html2canvas(element, {
+                backgroundColor: '#ffffff', // Force white background for better visibility
+                scale: 3, // Higher scale for better resolution
+                logging: false
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `math-equation.${type}`;
+                link.href = canvas.toDataURL(`image/${type}`, 1.0); // Max quality
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }).catch(err => {
+                console.error('Export failed:', err);
+                alert('Failed to export image.');
+            });
+        }
     </script>
 </body>
 </html>
